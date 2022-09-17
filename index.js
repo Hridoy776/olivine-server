@@ -17,46 +17,55 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 
-async function run(){
+async function run() {
 
-    
-    try{
+
+    try {
         await client.connect()
 
         const foodCollection = client.db("olivine").collection("foods");
         const orderCollection = client.db("olivine").collection("order");
         // food api for get
-        app.get('/foods', async (req,res)=>{
-            const query={};
+        app.get('/foods', async (req, res) => {
+            const query = {};
             const result = await foodCollection.find(query).toArray();
             res.send(result)
         })
-        app.get('/order', async (req,res)=>{
-            const query={};
+        app.get('/order', async (req, res) => {
+            const query = {};
             const result = await orderCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        app.get('/order/:id([0-9a-fA-F]{24})', async (req, res) => {
+
+            const id =req.params.id ;
+            console.log(id)
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.findOne(query);
             res.send(result)
         })
 
         // post api for order
 
-        app.post("/order/:id", async (req,res)=>{
-            const id=req.params.id;
-            const query = {_id: ObjectId(id)}
-            const orderFood= await foodCollection.findOne(query);
-            const order= await orderCollection.insertOne(orderFood);
+        app.post("/order/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const orderFood = await foodCollection.findOne(query);
+            const order = await orderCollection.insertOne(orderFood);
 
-            res.send({data:order,status:"success"});
+            res.send({ data: order, status: "success" });
 
         })
         // order delete api 
-        app.delete('/order/:id',async(req,res)=>{
-            const id=req.params.id;
-            const query={_id: ObjectId(id)};
-            const result= await orderCollection.deleteOne(query);
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
             res.send(result);
         })
 
-    }finally{
+    } finally {
 
     }
 }
@@ -65,8 +74,8 @@ run().catch(console.dir)
 console.log('db-connected')
 app.get('/', (req, res) => {
     res.send('Hello World!')
-  })
-  
-  app.listen(port, () => {
+})
+
+app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
-  })
+})
