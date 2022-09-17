@@ -37,7 +37,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/order/:id([0-9a-fA-F]{24})', async (req, res) => {
+        app.get('/order/:id', async (req, res) => {
 
             const id =req.params.id ;
             console.log(id)
